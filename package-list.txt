@@ -37,5 +37,5 @@ betterlockscreen
 bemoji
 x11-emoji-picker
 
-fusuma
+ruby-fusuma
 brillo

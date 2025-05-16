@@ -44,6 +44,24 @@ while IFS= read -r package || [[ -n "$package" ]]; do
     fi
 done < "$PACKAGE_FILE"
 
+# Display categorized packages
+echo "Packages to install from Arch official repositories (Pacman):"
+if [[ ${#PACMAN_PACKAGES[@]} -gt 0 ]]; then
+    printf "  - %s\n" "${PACMAN_PACKAGES[@]}"
+else
+    echo "  None"
+fi
+
+echo
+echo "Packages to install from AUR (Yay):"
+if [[ ${#YAY_PACKAGES[@]} -gt 0 ]]; then
+    printf "  - %s\n" "${YAY_PACKAGES[@]}"
+else
+    echo "  None"
+fi
+
+echo
+
 # Install all pacman packages in one go
 if [[ ${#PACMAN_PACKAGES[@]} -gt 0 ]]; then
     echo "Installing packages from Arch official repositories: ${PACMAN_PACKAGES[*]}"
