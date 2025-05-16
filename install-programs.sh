@@ -6,7 +6,7 @@ if [[ $# -ne 1 ]]; then
     exit 1
 fi
 
-PACKAGE_FILE="package-list.txt"
+PACKAGE_FILE="$1"
 
 # Check if file exists
 if [[ ! -f "$PACKAGE_FILE" ]]; then
@@ -29,20 +29,36 @@ if ! command -v yay &>/dev/null; then
     fi
 fi
 
-# Read package list and install
+# Separate packages into two lists: pacman and yay
+PACMAN_PACKAGES=()
+YAY_PACKAGES=()
+
 while IFS= read -r package || [[ -n "$package" ]]; do
     # Skip empty lines and comments
     [[ -z "$package" || "$package" =~ ^# ]] && continue
 
-    echo "Attempting to install: $package"
-
-    # Try pacman first
     if sudo pacman -Si "$package" &>/dev/null; then
-        sudo pacman -S --noconfirm "$package"
+        PACMAN_PACKAGES+=("$package")
     else
-        echo "Not in pacman repos, trying yay (AUR)..."
-        yay -S --noconfirm "$package"
+        YAY_PACKAGES+=("$package")
     fi
 done < "$PACKAGE_FILE"
+
+# Install all pacman packages in one go
+if [[ ${#PACMAN_PACKAGES[@]} -gt 0 ]]; then
+    echo "Installing packages from Arch official repositories: ${PACMAN_PACKAGES[*]}"
+    sudo pacman -S --noconfirm "${PACMAN_PACKAGES[@]}"
+else
+    echo "No packages to install from Arch official repositories."
+fi
+
+# Install all yay packages in one go
+if [[ ${#YAY_PACKAGES[@]} -gt 0 ]]; then
+    echo "Installing packages from AUR using yay: ${YAY_PACKAGES[*]}"
+    yay -S --noconfirm "${YAY_PACKAGES[@]}"
+else
+    echo "No packages to install from AUR."
+fi
+
 echo "All packages processed."
 
