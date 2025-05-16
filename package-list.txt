@@ -39,3 +39,5 @@ x11-emoji-picker
 
 ruby-fusuma
 brillo
+
+nitch
